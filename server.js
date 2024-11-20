@@ -2,12 +2,22 @@ const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const bcrypt = require('bcrypt');
+const cors = require('cors'); // Import the CORS middleware
 require('dotenv').config();
 
 const { registerUser, getUserByUsername, saveProgress, getProgress } = require('./database/user');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Configure CORS
+const corsOptions = {
+    origin: process.env.CORS_ALLOWED_ORIGIN || '*', // Allow all origins or specify the allowed origin(s)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed request headers
+    credentials: true // Allow cookies and credentials
+};
+app.use(cors(corsOptions));
 
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
@@ -22,15 +32,14 @@ var mongoStore = MongoStore.create({
     crypto: {
         secret: mongodb_session_secret
     }
-})
+});
 
 app.use(session({
     secret: node_session_secret,
     store: mongoStore,
     saveUninitialized: false,
     resave: true
-}
-));
+}));
 
 app.get('/', (req, res) => {
     res.send('Hello World');
