@@ -77,7 +77,7 @@ app.post('/api/login', async (req, res) => {
         req.session.userID = user.id;
         res.send('Logged in');
     } catch (err) {
-        res.status(500).send('Server error');
+        res.status(500).send('Server error' + err);
     }
 });
 
