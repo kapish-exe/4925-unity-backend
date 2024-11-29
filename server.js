@@ -71,25 +71,53 @@ app.post('/api/login', async (req, res) => {
     try {
         const user = await getUserByUsername(username);
         if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).send('Invalid credentials');
+            return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
+        // Store userID in session
         req.session.userID = user.id;
-        res.send('Logged in');
+
+        // Send structured response
+        res.json({
+            success: true,
+            message: 'Logged in successfully',
+            userID: user.user_id,
+            username: user.username // Optional, if needed
+        });
     } catch (err) {
-        res.status(500).send('Server error' + err);
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
     }
 });
 
-app.post('/api/progress', async (req, res) => {
-    const { level, coins, enemiesDefeated } = req.body;
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
 
-    if (!req.session.userID) {
-        return res.status(401).send('Not authenticated');
+    // Validate the username and password
+    const user = await findUser(username, password); // Replace with your database query
+    if (!user) {
+        return res.status(401).json({
+            status: "error",
+            message: "Invalid username or password"
+        });
     }
 
+    // Successful login
+    res.json({
+        status: "success",
+        message: "Logged in successfully",
+        userID: user.id,          // Assuming 'id' is the unique user identifier in your database
+        username: user.username,  // Optional, for display or debugging purposes
+        authToken: generateToken(user.id) // Optional, generate JWT for secure communication
+    });
+});
+
+
+app.post('/api/progress', async (req, res) => {
+    const { userID, level, coins, enemiesDefeated } = req.body;
+
+
     try {
-        await saveProgress(req.session.userID, level, coins, enemiesDefeated);
+        await saveProgress(userID, level, coins, enemiesDefeated);
         res.send('Progress saved');
     } catch (err) {
         res.status(500).send('Server error');
