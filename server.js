@@ -120,7 +120,7 @@ app.post('/api/progress', async (req, res) => {
         await saveProgress(userID, level, coins, enemiesDefeated);
         res.send('Progress saved');
     } catch (err) {
-        res.status(500).send('Server error');
+        res.status(500).send('Server error' + err);
     }
 });
 

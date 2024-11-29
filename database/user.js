@@ -13,7 +13,7 @@ async function registerUser(username, hashedPassword) {
 
 // Check if a username exists
 async function getUserByUsername(username) {
-    const query = 'SELECT user_id, password FROM users WHERE username = ?';
+    const query = 'SELECT user_id, password, username FROM users WHERE username = ?';
     try {
         const [rows] = await db.query(query, [username]);
         return rows[0];
