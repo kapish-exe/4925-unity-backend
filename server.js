@@ -105,9 +105,8 @@ app.post('/api/login', async (req, res) => {
     res.json({
         status: "success",
         message: "Logged in successfully",
-        userID: user.id,          // Assuming 'id' is the unique user identifier in your database
-        username: user.username,  // Optional, for display or debugging purposes
-        authToken: generateToken(user.id) // Optional, generate JWT for secure communication
+        userID: user.id,          
+        username: user.username,  
     });
 });
 
@@ -115,14 +114,39 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/progress', async (req, res) => {
     const { userID, level, coins } = req.body;
 
+    // Input validation
+    if (!userID || level === undefined || coins === undefined) {
+        return res.status(400).json({
+            success: false,
+            message: 'Missing required fields: userID, level, or coins.',
+        });
+    }
 
     try {
+        // Save progress in the database
         await saveProgress(userID, level, coins);
-        res.send('Progress saved');
+
+        // Respond with success
+        res.status(200).json({
+            success: true,
+            message: 'Progress saved successfully.',
+            data: {
+                userID: userID,
+                level: level,
+                coins: coins,
+            },
+        });
     } catch (err) {
-        res.status(500).send('Server error' + err);
+        // Log the error and send a 500 response
+        console.error('Error saving progress:', err);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while saving progress.',
+            error: err.message,
+        });
     }
 });
+
 
 app.get('/api/progress', async (req, res) => {
     if (!req.session.userID) {
