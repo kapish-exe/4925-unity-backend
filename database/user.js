@@ -24,14 +24,14 @@ async function getUserByUsername(username) {
 }
 
 // Save or update user progress
-async function saveProgress(userID, level, coins, enemiesDefeated) {
+async function saveProgress(userID, level, coins) {
     const query = `
-        INSERT INTO progress (user_id, level, coins, enemies_defeated)
-        VALUES (?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE level = ?, coins = ?, enemies_defeated = ?
+        INSERT INTO progress (user_id, level, coins)
+        VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE level = ?, coins = ?
     `;
     try {
-        await db.query(query, [userID, level, coins, enemiesDefeated, level, coins, enemiesDefeated]);
+        await db.query(query, [userID, level, coins, level, coins]);
     } catch (err) {
         console.error('Error saving progress:', err);
         throw err;

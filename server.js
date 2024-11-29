@@ -113,11 +113,11 @@ app.post('/api/login', async (req, res) => {
 
 
 app.post('/api/progress', async (req, res) => {
-    const { userID, level, coins, enemiesDefeated } = req.body;
+    const { userID, level, coins } = req.body;
 
 
     try {
-        await saveProgress(userID, level, coins, enemiesDefeated);
+        await saveProgress(userID, level, coins);
         res.send('Progress saved');
     } catch (err) {
         res.status(500).send('Server error' + err);
