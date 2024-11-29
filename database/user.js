@@ -26,10 +26,7 @@ async function getUserByUsername(username) {
 // Save or update user progress
 async function saveProgress(userID, level, coins) {
     const query = `
-        INSERT INTO progress (user_id, level, coins)
-        VALUES (?, ?, ?)
-        ON DUPLICATE KEY UPDATE level = ?, coins = ?
-    `;
+        UPDATE progress SET level = ?, coins = ? WHERE user_id = ?; `;
     try {
         await db.query(query, [userID, level, coins, level, coins]);
     } catch (err) {
