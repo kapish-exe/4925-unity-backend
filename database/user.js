@@ -1,4 +1,5 @@
 const db = require('./databaseConnection');
+// check pull and merge
 
 // Register a new user
 async function registerUser(username, hashedPassword) {
