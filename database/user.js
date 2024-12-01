@@ -30,7 +30,7 @@ async function saveProgress(userID, level, coins) {
         VALUES (?, ?, ?)
         ON DUPLICATE KEY UPDATE level = ?, coins = ?`
             try {
-        await db.query(query, [userID, level, coins, level, coins]);
+        await db.query(query, [userID, level, coins]);
     } catch (err) {
         console.error('Error saving progress:', err);
         throw err;
@@ -39,7 +39,8 @@ async function saveProgress(userID, level, coins) {
 
 // Get user progress
 async function getProgress(userID) {
-    const query = 'SELECT level, coins, enemies_defeated FROM progress WHERE user_id = ?';
+    const query = 'SELECT * FROM progress WHERE user_id = ?';
+    // const query = 'SELECT level, coins, enemies_defeated FROM progress WHERE user_id = ?';
     try {
         const [rows] = await db.query(query, [userID]);
         return rows[0];
