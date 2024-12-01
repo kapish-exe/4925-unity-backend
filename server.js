@@ -48,19 +48,38 @@ app.get('/', (req, res) => {
 app.post('/api/register', async (req, res) => {
     const { username, password } = req.body;
 
-    if (!username || !password || password.length < 10) {
-        return res.status(400).send('Invalid input');
+    // Input validation
+    if (
+        !username ||
+        !/^[a-zA-Z0-9]{3,20}$/.test(username) || // Alphanumeric, 3-20 characters
+        !password ||
+        password.length < 10
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid input. Username must be alphanumeric (3-20 characters). Password must be at least 10 characters long.'
+        });
     }
 
     try {
+        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Register user in the database
         await registerUser(username, hashedPassword);
-        res.status(201).send('User registered');
+
+        // Respond with success
+        res.status(201).json({
+            success: true,
+            message: 'User registered'
+        });
     } catch (err) {
+        console.error('Error registering user:', err);
+
         if (err.code === 'ER_DUP_ENTRY') {
-            res.status(409).send('Username already exists');
+            res.status(409).json({ success: false, message: 'Username already exists' });
         } else {
-            res.status(500).send('Server error');
+            res.status(500).json({ success: false, message: 'An unexpected error occurred. Please try again later.' });
         }
     }
 });
