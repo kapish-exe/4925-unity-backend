@@ -168,12 +168,17 @@ app.post('/api/progress', async (req, res) => {
 
 
 app.get('/api/progress', async (req, res) => {
-    if (!req.session.userID) {
-        return res.status(401).send('Not authenticated');
+    // if (!req.session.userID) {
+    //     return res.status(401).send('Not authenticated');
+    // }
+    const userID = req.query.userID; 
+    if (!userID) {
+        return res.status(400).send('User ID is required');
     }
 
     try {
-        const progress = await getProgress(req.session.userID);
+        const progress = await getProgress(userID);
+        // const progress = await getProgress(req.session.userID);
         if (!progress) {
             return res.status(404).send('No progress found');
         }
