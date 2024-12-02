@@ -28,8 +28,9 @@ async function saveProgress(userID, level, coins) {
     const query = `
         INSERT INTO progress (user_id, level, coins)
         VALUES (?, ?, ?)
-        ON DUPLICATE KEY UPDATE level = ?, coins = ?`
-            try {
+        ON DUPLICATE KEY UPDATE level = VALUES(level), coins = VALUES(coins)`
+        // ALTER TABLE progress ADD UNIQUE (user_id);
+    try {
         await db.query(query, [userID, level, coins]);
     } catch (err) {
         console.error('Error saving progress:', err);
